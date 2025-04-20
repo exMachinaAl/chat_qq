@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChatA-QQ</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/script.js"></script>
+  </head>
+  <body>
+    <div class="log-container" style="display: none;">
+      <h1 class="log-title">hello QQ member</h1>
+      <input class="userN" id="userN" type="text" placeholder="userName" />
+      <input class="userP" id="userP" type="text" placeholder="passCode" />
+      <button class="submit-login" onclick="login()">login</button>
+    </div>
+    <div class="dashboard-qq" style="display: block">
+        <div class="profile-qq">
+            <p>hello <span id="user-name"></span></p>
+            <button onclick="logout()">logout</button>
+        </div>
+
+        <div class="main-friend-container">
+            <div id="friends-list"> <!-- dibawah sini merupakan html dynamic -->
+                <div class="friend-button">name</div>
+            </div>
+        </div>
+        <div class="main-chat-container">
+          <div class="chat-profile">
+            <div id="chat-profile-image"></div>
+            <span id="chat-profile-name"></span>
+          </div>
+          <div class="chat-message">
+            <div class="chat-l-message"></div>
+            <input class="chat-message-input" type="text">
+            <button onclick="" class="chat-message-button"></button>
+          </div>
+        </div>
+
+        <div class="navbar-setting">
+          <div id="home-menu">home</div>
+          <div id="notification-menu">notification</div>
+          <div id="profile-menu">profile</div>
+        </div>
+      </div>
+    </body>
+</html>
