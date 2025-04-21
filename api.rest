@@ -1,3 +1,0 @@
-GET http://localhost:3000/api/chat/history?sender_id=1&receiver_id=2
-###
-GET http://localhost:3000/api/chat/history/1/2
