@@ -18,14 +18,14 @@
     <script src="/script.js"></script>
   </head>
   <body>
-    <div class="login-container" style="display: block;">
+    <div class="login-container" style="display: none;">
         <h1 class="login-title">hello QQ member</h1>
         <input class="login-input" id="userN" type="text" placeholder="email" />
         <input class="login-input" id="userP" type="text" placeholder="pass" />
         <button class="login-submit" onclick="login()">login</button>
       </div>
     
-    <div class="dashboard-chat" style="display: none;">
+    <div class="dashboard-chat" style="display: flex;">
       <!-- Mobile Touch Overlay for Sidebar -->
       <input type="checkbox" id="sidebar-toggle" class="hidden-toggle" />
       <label for="sidebar-toggle" class="overlay"></label>
