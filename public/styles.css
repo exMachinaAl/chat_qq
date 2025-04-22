@@ -491,6 +491,10 @@ body {
         top: auto;
         bottom: calc(80px + var(--safe-area-inset-bottom));
     }
+
+    .button-add-friend {
+
+    }
 }
 
 /* iOS Specific Adjustments */
@@ -576,4 +580,66 @@ body {
     height: 100%;
     width: 100%;
     border: solid salmon 2px;
+}
+
+.button-add-friend {
+    display: flex;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    top: auto;
+    left: calc(270px + var(--safe-area-inset-left));
+    right: calc(30px + var(--safe-area-inset-right));
+    bottom: calc(35px + var(--safe-area-inset-bottom));
+    width: 3em;
+    height: 3em;
+    cursor: pointer;
+    border-radius: 20px;
+    border: solid 2px;
+    padding: 5px 10px;
+    z-index: 15;
+}
+
+
+.popup-add-fr-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.popup-add-friend {
+    position: fixed;
+    flex-direction: column;
+    /* flex-wrap: wrap; */
+    /* gap: 10px; */
+    height: 20em;
+    width: 15em;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    border: solid aquamarine 1px;
+    border-radius: 5px;
+}
+.popup-add-friend input {
+    height: 25px;
+    width: 65%;
+    border-radius: 10px;
+    padding: 10px 20px;
+    margin: 20px;
+}
+.popup-add-friend .popup-button button {
+    text-align: center;
+    justify-content: center;
+    border-radius: 10px;
+    height: 20px;
+    cursor: pointer;
+    width: 5em;
+    margin-left: 10px;
 }

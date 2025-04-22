@@ -141,6 +141,23 @@ function login() {
 //   // bisa redirect ke halaman chat nanti
 // }
 
+function addFriend_popup () {
+  document.querySelector('.popup-add-fr-overlay').style.display = "flex";
+}
+async function addFriend_add () {
+
+  const emailQnotelp = document.getElementById('input-mail-noTelp').value;
+  await fetch(`${hostApi}/api/friend/addfriend?playerQuid=${localStorage.getItem('QUID')}&emailQnotelp=${emailQnotelp}`, {
+    headers : {
+      Authorization: "Bearer " + localStorage.getItem('token'),
+    },
+  })
+  // alert("hell nah")
+  document.getElementById('input-mail-noTelp').value = "";
+  document.querySelector('.popup-add-fr-overlay').style.display = "none";
+  // location.reload()
+}
+
 function showDashboard(username) {
   document.querySelector(".login-container").style.display = "none";
   document.querySelector(".dashboard-chat").style.display = "flex";

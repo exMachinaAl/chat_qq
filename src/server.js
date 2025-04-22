@@ -9,7 +9,10 @@ const session = require("express-session");
 const db = require("./utility/mysql");
 const path = require("path");
 const jwt = require("jsonwebtoken");
+
 const chatRoutes = require("./router/chat");
+const friendRoutes = require("./router/friends")
+
 const cors = require("cors");
 const { json } = require("stream/consumers");
 
@@ -87,6 +90,9 @@ io.on("connection", (socket) => {
 
 // chat logic
 app.use("/api/chat", chatRoutes);
+
+// friend logic
+app.use('/api/friend', authenticationToken, friendRoutes)
 // app.get("/api/chat/history/:sender_id/:receiver_id", async (req, res) => {
 //   const { sender_id, receiver_id } = req.params;
 //   const sql = `

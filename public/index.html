@@ -18,14 +18,14 @@
     <script src="/script.js"></script>
   </head>
   <body>
-    <div class="login-container" style="display: block;">
-        <h1 class="login-title">hello QQ member</h1>
-        <input class="login-input" id="userN" type="text" placeholder="email" />
-        <input class="login-input" id="userP" type="text" placeholder="pass" />
-        <button class="login-submit" onclick="login()">login</button>
-      </div>
-    
-    <div class="dashboard-chat" style="display: none;">
+    <div class="login-container" style="display: block">
+      <h1 class="login-title">hello QQ member</h1>
+      <input class="login-input" id="userN" type="text" placeholder="email" />
+      <input class="login-input" id="userP" type="text" placeholder="pass" />
+      <button class="login-submit" onclick="login()">login</button>
+    </div>
+
+    <div class="dashboard-chat" style="display: none">
       <!-- Mobile Touch Overlay for Sidebar -->
       <input type="checkbox" id="sidebar-toggle" class="hidden-toggle" />
       <label for="sidebar-toggle" class="overlay"></label>
@@ -55,6 +55,7 @@
         </div>
 
         <div class="conversations" id="friends-list">
+          <div class="button-add-friend" onclick="addFriend_popup()">+</div>
           <!-- <a href="#" class="conversation active">
             <div class="conversation-avatar">A</div>
             <div class="conversation-info">
@@ -74,8 +75,8 @@
               </div>
             </div>
         </a> -->
-        
-        <!-- 
+
+          <!-- 
           <a href="#" class="conversation">
             <div class="conversation-avatar">T</div>
             <div class="conversation-info">
@@ -100,13 +101,13 @@
           <label for="sidebar-toggle" class="menu-button">☰</label>
           <div class="avatar">A</div>
           <div class="user-info">
-            <div class="user-name" >Amanda</div>
+            <div class="user-name">Amanda</div>
             <!-- <div class="user-status">Online</div> -->
           </div>
         </div>
-        
+
         <div class="chat-messages" id="chatBox">
-            <!-- 
+          <!-- 
           <div class="message received">
             Halo, apa kabar
             <div class="message-timestamp">10:30 AM</div>
@@ -145,7 +146,11 @@
         </div>
 
         <div class="chat-input">
-          <input id="input-message-chat" type="text" placeholder="Type a message..." />
+          <input
+            id="input-message-chat"
+            type="text"
+            placeholder="Type a message..."
+          />
           <div class="attachment-button" onclick="sendMessage()">></div>
         </div>
       </div>
@@ -154,6 +159,27 @@
       <label for="mode-switch" class="mode-toggle">
         <span class="toggle-text"></span>
       </label>
+
+      <!-- <label for="mode-switch" class="mode-toggle">
+        <span class="toggle-text"></span>
+      </label> -->
     </div>
+
+    <div class="popup-add-fr-overlay" style="display: none;">
+      <div class="popup-add-friend" style="display: flex">
+        <span id="info-adder-friend">insert y code FR</span>
+        <input id="input-mail-noTelp" type="text" placeholder="email or number" />
+        <div class="popup-button" style="display: flex; flex-wrap: wrap;">
+          <button onclick="clickAddFR()">close</button>
+          <button onclick="addFriend_add()">add</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      function clickAddFR() {
+        document.getElementById('input-mail-noTelp').value = "";
+        document.querySelector('.popup-add-fr-overlay').style.display = "none";
+      }
+    </script>
   </body>
 </html>
