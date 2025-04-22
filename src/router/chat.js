@@ -2,15 +2,22 @@ const express = require("express");
 const router = express.Router();
 const db = require("../utility/mysql");
 
-router.post("send", (req, res) => {
+router.post("/send", async (req, res) => {
   const { sender_id, receiver_id, message } = req.body;
-  const sql =
-    "INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)";
-  db.query(sql, [sender_id, receiver_id, message], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
+
+  try {
+    const sql =
+      "INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)";
+    
+    const [result] = await db.query(sql, [sender_id, receiver_id, message]);
+
     res.json({ success: true, message_id: result.insertId });
-  });
+  } catch (err) {
+    console.error("Error inserting message:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 });
+
 
 // Ambil riwayat pesan antar 2 user
 router.get("/history", async (req, res) => {
