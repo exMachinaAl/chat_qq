@@ -1,3 +1,12 @@
 GET http://localhost:3000/api/chat/history?sender_id=1&receiver_id=2
 ###
 GET http://localhost:3000/api/chat/history/1/2
+
+###
+POST http://localhost:3000/api/register
+Content-Type: application/json
+
+{
+    "user": "qiqi@",
+    "password": "manok"
+}

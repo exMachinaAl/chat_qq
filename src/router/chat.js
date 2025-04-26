@@ -32,6 +32,7 @@ router.get("/history", async (req, res) => {
   try {
     const [results] = await db.query(sql, [sender_id, receiver_id, receiver_id, sender_id]);
     res.json(results);
+    console.log(results)
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

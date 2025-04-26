@@ -15,7 +15,7 @@
     <title>Voxtalk</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/script.js"></script>
+    
   </head>
   <body>
     <div class="login-container" style="display: block">
@@ -23,6 +23,21 @@
       <input class="login-input" id="userN" type="text" placeholder="email" />
       <input class="login-input" id="userP" type="text" placeholder="pass" />
       <button class="login-submit" onclick="login()">login</button>
+      <a style="color: aqua; cursor: pointer;" data-href="/register">register</a>
+    </div>
+
+    <div class="middle-form" style="display: none;">
+      <div class="registrasi-form-box">
+        <h2>Register</h2>
+        <input
+          type="text"
+          id="emailOrPhone"
+          placeholder="Email atau Nomor Telepon"
+        />
+        <input type="password" id="password" placeholder="Password" />
+        <button onclick="submitForm()">Daftar</button>
+        <a style="color: black; cursor: pointer;" data-href="/login">login</a>
+      </div>
     </div>
 
     <div class="dashboard-chat" style="display: none">
@@ -50,6 +65,15 @@
           </div>
         </div>
 
+        <div id="player-information">
+          <script>
+            document.getElementById('player-information').innerHTML =
+            `
+            <p>QUID: ${localStorage.getItem('QUID')}</p>
+            <p>username: ${localStorage.getItem('username')}</p>
+            `
+          </script>
+        </div>
         <div class="search-bar">
           <input type="text" class="search-input" placeholder="Search..." />
         </div>
@@ -165,20 +189,25 @@
       </label> -->
     </div>
 
-    <div class="popup-add-fr-overlay" style="display: none;">
+    <div class="popup-add-fr-overlay" style="display: none">
       <div class="popup-add-friend" style="display: flex">
         <span id="info-adder-friend">insert y code FR</span>
-        <input id="input-mail-noTelp" type="text" placeholder="email or number" />
-        <div class="popup-button" style="display: flex; flex-wrap: wrap;">
+        <input
+          id="input-mail-noTelp"
+          type="text"
+          placeholder="email or number"
+        />
+        <div class="popup-button" style="display: flex; flex-wrap: wrap">
           <button onclick="clickAddFR()">close</button>
           <button onclick="addFriend_add()">add</button>
         </div>
       </div>
     </div>
+    <script src="/script.js"></script>
     <script>
       function clickAddFR() {
-        document.getElementById('input-mail-noTelp').value = "";
-        document.querySelector('.popup-add-fr-overlay').style.display = "none";
+        document.getElementById("input-mail-noTelp").value = "";
+        document.querySelector(".popup-add-fr-overlay").style.display = "none";
       }
     </script>
   </body>

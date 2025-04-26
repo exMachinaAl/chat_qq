@@ -1,5 +1,7 @@
 const hostApi = "http://localhost:3000";
 const socket = io("http://localhost:3000");
+// const hostApi = "https://buck-well-kingfish.ngrok-free.app";
+// const socket = io("https://buck-well-kingfish.ngrok-free.app");
 
 window.onload = async () => {
   // localStorage.clear()
@@ -62,6 +64,7 @@ window.onload = async () => {
           //   container.appendChild(div);
         });
       });
+      
     // const dataDecode = data.json();
     // console.log(dataDecode)
   }
@@ -218,6 +221,7 @@ function renderMessages(sender_id, receiver_id, messages) {
     divTime.className = "message-timestamp";
     divTime.textContent = msg.timestamp;
     divMsg.appendChild(divTime)
+    // console.log(msg)
   });
     // chatBox.innerHTML = messages
     //   .map(
@@ -254,3 +258,86 @@ socket.on("new_message", (data) => {
 });
 
 // loadMessages();
+
+
+function submitForm() {
+  const data = {
+    user: document.getElementById("emailOrPhone").value,
+    password: document.getElementById("password").value
+  };
+
+  fetch(`${hostApi}/api/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(response => {
+    alert(response.message);
+    if(response?.status) {
+      document.querySelector('.middle-form').style.display = "none";
+      document.querySelector('.login-container').style.display = "block";
+    }
+  })
+  .catch(err => {
+    alert("Gagal koneksi ke server!");
+    console.error(err);
+  });
+}
+
+document.querySelectorAll("a[data-href]").forEach((link) => { // hanya sebagai perpindahan tab reg to log dan sebaliknya
+  link.addEventListener('click', function (e) {
+    e.preventDefault()
+    // alert('hell nah,', e.currentTarget.getAttribute('data-href')) // wrong tipe of check debug
+    const directroute = e.currentTarget.getAttribute('data-href')
+    if(directroute === "/register") {
+      document.querySelector('.login-container').style.display = "none";
+      document.querySelector('.middle-form').style.display = "block";
+    } else if (directroute === "/login") {
+      document.querySelector('.middle-form').style.display = "none";
+      document.querySelector('.login-container').style.display = "block";
+    }
+  })
+})
+
+function isLoginUI () {
+  const isLogin = (document.querySelector(".login-container").style.display === "block") ? true : false;
+  console.log(isLogin)
+}
+
+
+
+// const routes = {
+//   "#/": "login",
+//   "#/login": "login",
+//   "#/my": "my",
+//   "#/register": "status"
+// };
+
+function showPage(route) {
+  // document.querySelectorAll('.container').forEach((el) => el.classList.remove('active'));
+
+  // const pageId = routes[route] || "dashboard";
+  // const page = document.getElementById(pageId);
+
+  // if (page) {
+      // page.classList.add('active');
+      // if (route === "#/status") {
+      //     tampilkanDataStatus();
+      // }
+  // } else {
+  //     alert("Halaman tidak ditemukan.");
+  // }
+}
+
+// function navigate(route) {
+//   location.hash = route;
+// }
+
+// window.addEventListener('hashchange', () => {
+//   showPage(location.hash);
+// });
+
+// window.addEventListener('load', () => {
+//   showPage(location.hash || "#/");
+// });

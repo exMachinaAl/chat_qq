@@ -11,7 +11,7 @@ const path = require("path");
 const jwt = require("jsonwebtoken");
 
 const chatRoutes = require("./router/chat");
-const friendRoutes = require("./router/friends")
+const friendRoutes = require("./router/friends");
 
 const cors = require("cors");
 const { json } = require("stream/consumers");
@@ -92,7 +92,7 @@ io.on("connection", (socket) => {
 app.use("/api/chat", chatRoutes);
 
 // friend logic
-app.use('/api/friend', authenticationToken, friendRoutes)
+app.use("/api/friend", authenticationToken, friendRoutes);
 // app.get("/api/chat/history/:sender_id/:receiver_id", async (req, res) => {
 //   const { sender_id, receiver_id } = req.params;
 //   const sql = `
@@ -143,6 +143,52 @@ app.get("/api/friends/:playerId", authenticationToken, async (req, res) => {
 
 app.delete("/api/logout", (req, res) => {
   res.json({ message: "data deleted" });
+});
+
+app.post("/api/register", async (req, res) => {
+  const { user, password } = req.body;
+
+  if (!user || !password) {
+    return res.json({ message: "Semua field wajib diisi." });
+  }
+
+  // Regex sederhana
+  const isEmail = user.includes("@");
+  const isPhone = /^\d+$/.test(user);
+
+  if (isEmail) {
+    // untuk mendapatakan OUT dari procedure
+    const [status] = await db.query("call check_usedable_email(?, @dataOut)", [
+      user,
+    ]);
+    const [statuslvl] = await db.query("select @dataOut as data");
+
+    console.log(statuslvl[0]?.data)
+    if (statuslvl[0]?.data == 0) {
+      return res.json({ message: "email atau nomor sudah digunakan", status: false });
+    }
+
+    const [resultH] = await db.query('call app_registration(?,?,?)', [1, user, password])
+    return res.json({ message: "pendaftaran berhasil", status: true })
+  }
+
+  // let sqlN = `INSERT INTO`
+
+  // if (isEmail) { // tolong data dimasukkan ke database
+  //   console.log("Input adalah email:", user);
+  //   const [rest] = await db.query()
+  //   // Simpan ke database atau proses lain
+  //   return res.json({ message: "Registrasi berhasil dengan email!" });
+  // }
+
+  if (isPhone) {
+    console.log("Input adalah nomor telepon:", user);
+    return res.json({ message: "Registrasi berhasil dengan nomor!" });
+  }
+
+  res.json({ message: "anda seharusnya memasukkan email atau nomor-telepon", status: false })
+
+  // return res.json({ message: "Format tidak valid. Masukkan email atau nomor telepon." });
 });
 
 app.post("/api/login", async (req, res) => {

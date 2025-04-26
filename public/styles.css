@@ -643,3 +643,60 @@ body {
     width: 5em;
     margin-left: 10px;
 }
+
+
+
+/* registrasi css */
+.middle-form {
+    display: flex;
+    position: fixed;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    border: solid aqua 1px;
+}
+.registrasi-form-box {
+    /* justify-content: center; */
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+    background: white;
+    padding: 30px;
+    width: 20em;
+    height: 30em;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    /* width: 300px; */
+  }
+
+  .registrasi-form-box h2 {
+    color: #007bff;
+    /* background: aqua; */
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .registrasi-form-box input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+
+  .registrasi-form-box button {
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .registrasi-form-box button:hover {
+    background: #0056b3;
+  }
