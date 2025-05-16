@@ -373,7 +373,7 @@ body {
     max-width: 80%;
     padding: 10px 15px;
     border-radius: 18px;
-    margin-bottom: 25px;
+    margin-bottom: 10px;
     position: relative;
     transition: background-color 0.3s ease;
     word-wrap: break-word;
@@ -391,24 +391,6 @@ body {
     background-color: var(--message-bg-sent);
     align-self: flex-end;
     border-bottom-right-radius: 5px;
-}
-
-.message-name-sender {
-    display: flex;
-    position: absolute;
-    width: 80px;
-    /* background-color: #007bff; */
-    justify-content: center;
-    border-radius: 10px;
-    top: -10px;
-}
-.message.sent .message-name-sender {
-    display: none;
-    background-color: #9c4df7;
-}
-.message.received .message-name-sender {
-    right: 5px;
-    background-color: #3f3e3e;
 }
 
 .message-timestamp {

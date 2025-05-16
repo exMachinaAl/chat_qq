@@ -10,3 +10,12 @@ Content-Type: application/json
     "user": "qiqi@",
     "password": "manok"
 }
+
+###
+GET http://localhost:3000/api/chat/getgroup?QUID_player=1
+
+###
+GET http://localhost:3000/api/chat/historygroupwa?group_xid=2
+
+###
+GET http://localhost:3000/api/friend/friendData?QUID_fr=1

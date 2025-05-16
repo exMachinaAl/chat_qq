@@ -16,10 +16,27 @@ router.get("/addfriend", async (req, res) => {
     const [resulta] = await db.query(sql2, [playerQuid, resultsFQ[0]?.QUID]);
     // console.log(emailQnotelp)
     res.json({ success: true });
-    console.log(resulta);
+    // console.log(resulta);
   } catch (error) {
     console.error(error)
   }
 });
+
+router.get('/friendData', async (req, res) => {
+  const { QUID_fr } = req.query;
+  const sql = `
+    SELECT username from qq_member WHERE QUID = ?;
+  `;
+
+  try {
+      const [results] = await db.query(sql, [
+        QUID_fr
+      ]);
+      res.json(results);
+      // console.log(results);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+})
 
 module.exports = router;

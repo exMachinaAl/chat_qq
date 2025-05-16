@@ -8,7 +8,7 @@ router.post("/send", async (req, res) => {
   try {
     const sql =
       "INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)";
-    
+
     const [result] = await db.query(sql, [sender_id, receiver_id, message]);
 
     res.json({ success: true, message_id: result.insertId });
@@ -18,6 +18,21 @@ router.post("/send", async (req, res) => {
   }
 });
 
+router.post("/sendgroup", async (req, res) => {
+  const { group_id, sender_id, message } = req.body;
+
+  try {
+    const sql =
+      "INSERT INTO group_member_message_wa (group_xid, QUID, group_message) VALUES (?,?,?)";
+
+    const [result] = await db.query(sql, [group_id, sender_id, message]);
+
+    res.json({ success: true, message_id: result.insertId });
+  } catch (err) {
+    console.error("Error inserting message:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
 
 // Ambil riwayat pesan antar 2 user
 router.get("/history", async (req, res) => {
@@ -30,9 +45,54 @@ router.get("/history", async (req, res) => {
   `;
 
   try {
-    const [results] = await db.query(sql, [sender_id, receiver_id, receiver_id, sender_id]);
+    const [results] = await db.query(sql, [
+      sender_id,
+      receiver_id,
+      receiver_id,
+      sender_id,
+    ]);
     res.json(results);
-    console.log(results)
+    // console.log(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/getgroup", async (req, res) => {
+  const { QUID_player } = req.query;
+  const sql = `
+    SELECT grp.group_xid, grp.group_member_authority, grpd.group_name, qm.username, qm.QUID FROM group_member_data_list_wa grp LEFT JOIN qq_member qm on grp.QUID = qm.QUID
+LEFT JOIN group_member_data_wa grpd on grp.group_xid = grpd.group_xid
+WHERE qm.QUID = ?;
+  `;
+
+  try {
+    const [results] = await db.query(sql, [
+      QUID_player
+    ]);
+    res.json(results);
+    // console.log(results[0]);
+    // results.forEach(el => {
+    //   console.log(el["group_xid"])
+    // })
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/historygroupwa", async (req, res) => {
+  const { group_xid } = req.query;
+  const sql = `
+    SELECT gwa.group_message, gwa.QUID, gwa.timestamp from group_member_message_wa gwa WHERE group_xid = ?
+ORDER BY timestamp ASC;
+  `;
+
+  try {
+    const [results] = await db.query(sql, [
+      group_xid
+    ]);
+    res.json(results);
+    // console.log(results);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -46,7 +106,5 @@ router.get("/history", async (req, res) => {
 //       });
 //     });
 //   }
-  
-  
 
 module.exports = router;

@@ -17,7 +17,10 @@ const cors = require("cors");
 const { json } = require("stream/consumers");
 
 const SECRET = process.env.JWT_SECRET;
+const DEFAULT_ROOM = "room"
 const HOST = "localhost";
+// const HOST = "0.0.0.0";
+// const HOST = "192.168.119.218";
 // const HOST = "https://buck-well-kingfish.ngrok-free.app";
 const PORT = 3000;
 
@@ -76,6 +79,69 @@ io.on("connection", (socket) => {
     // });
   });
 
+  // Saat user join group
+  socket.on("loadGroupAuth", ({ quid }) => {
+    // const members = groupMembers[group];
+
+    fetch(`http://localhost:3000/api/chat/getgroup?QUID_player=${quid}`, {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+
+        data.forEach((el) => {
+          // console.log("apoa itu el: ", el);
+          socket.join(`${DEFAULT_ROOM}${el["group_xid"]}`);
+          // console.log("someData: ", el['group_xid'])
+          // console.log(`${el} joined ${group}`);
+          // userSockets[quid] = { ...group };
+        });
+        // userSockets[]
+
+        // if (members && members.includes(quid)) {
+        // userMap[socket.id] = { quid, group };
+        // socket.join(group);
+        // socket.emit("joined", `Welcome to group ${group}`);
+        // } else {
+        //   socket.emit("error", "Access denied to this group");
+        // }
+      })
+      .catch((err) => {
+        console.error("ini error di socket gorui[", err);
+      });
+  });
+
+  // Saat kirim pesan
+  socket.on("sendMessageGroup", ({ quid, groupId, message }) => {
+    // const user = userMap[socket.id];
+    const user = userSockets[quid];
+    // console.log("try to use socket send message group")
+
+    fetch("http://localhost:3000/api/chat/sendgroup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ group_id: groupId, sender_id: quid, message }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success) {
+          // console.log("succes send message grp")
+        }
+      })
+      .catch(err => {
+        console.error("something in line 129: ", err)
+      })
+
+    if (user) {
+      const dataMSG = {
+        from: quid,
+        message,
+        timestamp: new Date(),
+      }
+      io.to((DEFAULT_ROOM+groupId)).emit("receiveMessage", dataMSG);
+    }
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
     // remove user from userSockets
@@ -93,7 +159,7 @@ io.on("connection", (socket) => {
 app.use("/api/chat", chatRoutes);
 
 // friend logic
-app.use("/api/friend", authenticationToken, friendRoutes);
+app.use("/api/friend", friendRoutes);
 // app.get("/api/chat/history/:sender_id/:receiver_id", async (req, res) => {
 //   const { sender_id, receiver_id } = req.params;
 //   const sql = `
@@ -164,13 +230,20 @@ app.post("/api/register", async (req, res) => {
     ]);
     const [statuslvl] = await db.query("select @dataOut as data");
 
-    console.log(statuslvl[0]?.data)
+    console.log(statuslvl[0]?.data);
     if (statuslvl[0]?.data == 0) {
-      return res.json({ message: "email atau nomor sudah digunakan", status: false });
+      return res.json({
+        message: "email atau nomor sudah digunakan",
+        status: false,
+      });
     }
 
-    const [resultH] = await db.query('call app_registration(?,?,?)', [1, user, password])
-    return res.json({ message: "pendaftaran berhasil", status: true })
+    const [resultH] = await db.query("call app_registration(?,?,?)", [
+      1,
+      user,
+      password,
+    ]);
+    return res.json({ message: "pendaftaran berhasil", status: true });
   }
 
   // let sqlN = `INSERT INTO`
@@ -187,7 +260,10 @@ app.post("/api/register", async (req, res) => {
     return res.json({ message: "Registrasi berhasil dengan nomor!" });
   }
 
-  res.json({ message: "anda seharusnya memasukkan email atau nomor-telepon", status: false })
+  res.json({
+    message: "anda seharusnya memasukkan email atau nomor-telepon",
+    status: false,
+  });
 
   // return res.json({ message: "Format tidak valid. Masukkan email atau nomor telepon." });
 });
