@@ -2,3 +2,5 @@ node_modules
 node_modules/*
 .dump
 .dump/*
+.vscode
+.vscode/*

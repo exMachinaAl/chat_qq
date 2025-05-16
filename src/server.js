@@ -18,6 +18,7 @@ const { json } = require("stream/consumers");
 
 const SECRET = process.env.JWT_SECRET;
 const HOST = "localhost";
+// const HOST = "https://buck-well-kingfish.ngrok-free.app";
 const PORT = 3000;
 
 //memulai untuk setel databse

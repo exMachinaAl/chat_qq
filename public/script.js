@@ -2,6 +2,19 @@ const hostApi = "http://localhost:3000";
 const socket = io("http://localhost:3000");
 // const hostApi = "https://buck-well-kingfish.ngrok-free.app";
 // const socket = io("https://buck-well-kingfish.ngrok-free.app");
+// const hostApi = "https://keno-impressed-several-pocket.trycloudflare.com";
+// const socket = io("https://keno-impressed-several-pocket.trycloudflare.com");
+// let hostApi;
+// let socket;
+// (async () => {
+  // hostApi = localStorage.getItem("customHost");
+  // socket = io(localStorage.getItem("customHost"));
+// })()
+
+// document.addEventListener('deviceready', async () => {
+//   console.log("Device ready");
+//   await mainLogic(); 
+// }, false);
 
 window.onload = async () => {
   // localStorage.clear()
@@ -46,29 +59,33 @@ window.onload = async () => {
 
           const divInfo = document.createElement("div");
           divInfo.className = "conversation-info";
-          divInfo.onclick = () => startChat(friend.QUID_friend); // ganti dari friend.id
+          divInfo.onclick = () => {
+            startChat(friend.QUID_friend); // ganti dari friend.id
+            document.getElementById("sidebar-toggle").checked = false;
+            // alert("membuka chat mode")
+          }
           ac.appendChild(divInfo);
 
           const divUN = document.createElement("div");
           divUN.className = "conversation-name";
           divUN.textContent = friend.username;
           divInfo.appendChild(divUN);
-          // divUN.className =
-          // const firstLetterName = friend.username || "@";
-          // console.log(`ini test ${friend.username.charAt(0)}`)
-
-          //   const div = document.createElement("div");
-          //   div.className = "conversation-name";
-          //   div.textContent = friend.username; // ganti dari friend.name
-          //   div.onclick = () => startChat(friend.QUID_friend); // ganti dari friend.id
-          //   container.appendChild(div);
         });
       });
-      
-    // const dataDecode = data.json();
-    // console.log(dataDecode)
   }
 };
+
+// function getNativeItem(key) {
+//   return new Promise((resolve, reject) => {
+//     NativeStorage.getItem(key, resolve, reject);
+//   });
+// }
+
+// function setNativeItem(key, value) {
+//   return new Promise((resolve, reject) => {
+//     NativeStorage.setItem(key, value, resolve, reject);
+//   });
+// }
 
 async function startChat(friendId) {
   let friendData = null;
@@ -79,14 +96,10 @@ async function startChat(friendId) {
   })
     .then((res) => res.json())
     .then((data) => {
-      // data.playerFriends.map
-      // console.log()
       friendData = data.playerFriends.find(
         (quid) => quid.QUID_friend === friendId
       );
     });
-  // const cc = document.getElementById('chat-header-focus');
-  // cc.className = 'mok'
 
   const chatFocusH = document.getElementById("chat-header-focus");
   // const divIP = document.createElement('div');
@@ -105,7 +118,6 @@ async function startChat(friendId) {
   divInfo.appendChild(divUN);
 
   localStorage.setItem('chatFocusFID', friendData?.QUID_friend)
-  //load old message
   await loadMessages(localStorage.getItem("QUID"), friendData?.QUID_friend);
 }
 
@@ -127,22 +139,11 @@ function login() {
         showDashboard(data.username);
         location.reload();
       }
-      //   fetch('/api/authentication')
-      //   .then(res => res.json())
-      //   .then(data => {
-      // if (data.loggedIn) {
-      //   showDashboard(data.username);
-      // }
     })
     .catch((err) => {
       console.log(err);
     });
 }
-
-// function startChat(friendId) {
-//   alert("Mulai chat dengan teman ID: " + friendId);
-//   // bisa redirect ke halaman chat nanti
-// }
 
 function addFriend_popup () {
   document.querySelector('.popup-add-fr-overlay').style.display = "flex";
@@ -158,13 +159,13 @@ async function addFriend_add () {
   // alert("hell nah")
   document.getElementById('input-mail-noTelp').value = "";
   document.querySelector('.popup-add-fr-overlay').style.display = "none";
-  // location.reload()
+  location.reload()
 }
 
 function showDashboard(username) {
   document.querySelector(".login-container").style.display = "none";
+  document.querySelector(".dev-mode-button-csv-class").style.display = "none"
   document.querySelector(".dashboard-chat").style.display = "flex";
-  //   document.getElementById("user-name").innerText = username;
 }
 
 function logout() {
@@ -176,11 +177,6 @@ function logout() {
   });
 }
 
-//testing socket.client
-
-// const sender_id = localStorage.getItem('QUID')
-// let receiver_id = null;
-// button / function send message
 async function sendMessage () {
   const sender_id = localStorage.getItem('QUID');
   const receiver_id = localStorage.getItem('chatFocusFID');
@@ -188,11 +184,8 @@ async function sendMessage () {
   const message = document.getElementById('input-message-chat').value;
   socket.emit('send_message', { sender_id, receiver_id, message });
   document.getElementById('input-message-chat').value = '';
-
-  // console.log(sender_id, receiver_id)
 }
 
-// Ambil riwayat pesan awal
 async function loadMessages(sender_id, receiver_id) {
   const res = await fetch(
     `${hostApi}/api/chat/history?sender_id=${sender_id}&receiver_id=${receiver_id}`
@@ -201,8 +194,6 @@ async function loadMessages(sender_id, receiver_id) {
     .then((data) => {
       renderMessages(sender_id, receiver_id, data);
     });
-  //   const messages = await res.json();
-  //   renderMessages(sender_id, receiver_id, messages);
 }
 
 // Render chat ke tampilan
@@ -221,27 +212,9 @@ function renderMessages(sender_id, receiver_id, messages) {
     divTime.className = "message-timestamp";
     divTime.textContent = msg.timestamp;
     divMsg.appendChild(divTime)
-    // console.log(msg)
   });
-    // chatBox.innerHTML = messages
-    //   .map(
-    //     (m) => `
-    //       <div className='message ${m.sender_id == sender_id ? "sent" : "received"}'>
-    //           ${m.message}
-    //       </div>
-
-    //   `
-    //   )
-    //   .join("");
 }
 
-// Submit pesan ke socket
-// document.getElementById("chatForm").addEventListener("submit", (e) => {
-//   e.preventDefault();
-//   const message = document.getElementById("message").value;
-//   socket.emit("send_message", { sender_id, receiver_id, message });
-//   document.getElementById("message").value = "";
-// });
 
 // Dapat pesan baru dari socket
 socket.on("new_message", (data) => {
@@ -257,7 +230,6 @@ socket.on("new_message", (data) => {
     divMsg.appendChild(divTime)
 });
 
-// loadMessages();
 
 
 function submitForm() {
@@ -295,7 +267,7 @@ document.querySelectorAll("a[data-href]").forEach((link) => { // hanya sebagai p
       document.querySelector('.middle-form').style.display = "block";
     } else if (directroute === "/login") {
       document.querySelector('.middle-form').style.display = "none";
-      document.querySelector('.login-container').style.display = "block";
+      document.querySelector('.login-container').style.display = "flex";
     }
   })
 })
@@ -305,39 +277,13 @@ function isLoginUI () {
   console.log(isLogin)
 }
 
-
-
-// const routes = {
-//   "#/": "login",
-//   "#/login": "login",
-//   "#/my": "my",
-//   "#/register": "status"
-// };
-
-function showPage(route) {
-  // document.querySelectorAll('.container').forEach((el) => el.classList.remove('active'));
-
-  // const pageId = routes[route] || "dashboard";
-  // const page = document.getElementById(pageId);
-
-  // if (page) {
-      // page.classList.add('active');
-      // if (route === "#/status") {
-      //     tampilkanDataStatus();
-      // }
-  // } else {
-  //     alert("Halaman tidak ditemukan.");
-  // }
+function devModePopup () {
+   document.querySelector('.popup-dev-mode-overlay').style.display = "flex"
 }
 
-// function navigate(route) {
-//   location.hash = route;
-// }
-
-// window.addEventListener('hashchange', () => {
-//   showPage(location.hash);
-// });
-
-// window.addEventListener('load', () => {
-//   showPage(location.hash || "#/");
-// });
+function newHost_DevMode () {
+  const customhost = document.getElementById('newHost').value;
+  localStorage.setItem("customHost", customhost);
+  document.getElementById('newHost').value = "";
+  document.querySelector(".popup-dev-mode-overlay").style.display = "none";
+}

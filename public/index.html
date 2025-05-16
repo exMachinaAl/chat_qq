@@ -15,18 +15,24 @@
     <title>Voxtalk</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="/socket.io/socket.io.js"></script>
-    
   </head>
   <body>
-    <div class="login-container" style="display: block">
-      <h1 class="login-title">hello QQ member</h1>
-      <input class="login-input" id="userN" type="text" placeholder="email" />
-      <input class="login-input" id="userP" type="text" placeholder="pass" />
-      <button class="login-submit" onclick="login()">login</button>
-      <a style="color: aqua; cursor: pointer;" data-href="/register">register</a>
+    <div class="login-container" style="display: flex">
+      <div class="login-wrapper-c">
+        <h1 class="login-title">QQ chat</h1>
+        <input class="login-input" id="userN" type="text" placeholder="email" />
+        <input class="login-input" id="userP" type="text" placeholder="pass" />
+        <button class="login-submit" onclick="login()">login</button>
+        <a style="color: aqua; cursor: pointer" data-href="/register"
+          >register</a
+        >
+      </div>
+      <button id="dev-mode-button-csv" class="dev-mode-button-csv-class" onclick="devModePopup()">
+        dm
+      </button>
     </div>
 
-    <div class="middle-form" style="display: none;">
+    <div class="middle-form" style="display: none">
       <div class="registrasi-form-box">
         <h2>Register</h2>
         <input
@@ -36,7 +42,7 @@
         />
         <input type="password" id="password" placeholder="Password" />
         <button onclick="submitForm()">Daftar</button>
-        <a style="color: black; cursor: pointer;" data-href="/login">login</a>
+        <a style="color: black; cursor: pointer" data-href="/login">login</a>
       </div>
     </div>
 
@@ -67,11 +73,10 @@
 
         <div id="player-information">
           <script>
-            document.getElementById('player-information').innerHTML =
-            `
-            <p>QUID: ${localStorage.getItem('QUID')}</p>
-            <p>username: ${localStorage.getItem('username')}</p>
-            `
+            document.getElementById("player-information").innerHTML = `
+            <p>QUID: ${localStorage.getItem("QUID")}</p>
+            <p>username: ${localStorage.getItem("username")}</p>
+            `;
           </script>
         </div>
         <div class="search-bar">
@@ -123,9 +128,11 @@
       <div class="chat-area">
         <div class="chat-header" id="chat-header-focus">
           <label for="sidebar-toggle" class="menu-button">☰</label>
-          <div class="avatar">A</div>
+          <div class="avatar">?</div>
           <div class="user-info">
-            <div class="user-name">Amanda</div>
+            <div class="user-name">
+              click bubble chat first, to start conversation
+            </div>
             <!-- <div class="user-status">Online</div> -->
           </div>
         </div>
@@ -203,12 +210,27 @@
         </div>
       </div>
     </div>
-    <script src="/script.js"></script>
+
+    <div class="popup-dev-mode-overlay" style="display: none">
+      <div class="popup-dev-mode" style="display: flex">
+        <span id="devtools-mod">all-devtools-mod</span>
+        <input id="newHost" type="text" placeholder="domain.com" />
+        <div class="popup-button" style="display: flex; flex-wrap: wrap">
+          <button onclick="closeDevPopup()">close</button>
+          <button onclick="newHost_DevMode()">add</button>
+        </div>
+      </div>
+    </div>
+
     <script>
       function clickAddFR() {
         document.getElementById("input-mail-noTelp").value = "";
         document.querySelector(".popup-add-fr-overlay").style.display = "none";
       }
+      function closeDevPopup() {
+        document.querySelector(".popup-dev-mode-overlay").style.display = "none";
+      }
     </script>
+    <script src="/script.js"></script>
   </body>
 </html>
