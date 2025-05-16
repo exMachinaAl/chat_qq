@@ -422,10 +422,10 @@ body {
         font-size: 16px;
     }
     
-    .chat-list {
+    /* .chat-list {
         width: 240px;
         padding: 15px 0px 0px 65px;
-    }
+    } */
 }
 
 @media (max-width: 576px) {
@@ -455,6 +455,7 @@ body {
         width: 100%;
         transform: translateX(-100%);
         z-index: 15;
+        padding: 15px 0px 0px 65px;
     }
     
     #sidebar-toggle:checked ~ .chat-list {
@@ -595,22 +596,34 @@ body {
     border: solid salmon 2px;
 }
 
+.button-add-container-foot {
+    display: flex;
+    /* position: absolute; */
+    /* align-items: center; */
+    justify-content: flex-end;
+    /* float: inline-end; */
+    /* border: solid aqua 2px; */
+    height: 70px;
+    width: 100%;
+    
+}
 .button-add-friend {
     display: flex;
-    position: absolute;
+    position: relative;
     align-items: center;
     justify-content: center;
-    top: auto;
-    left: calc(270px + var(--safe-area-inset-left));
-    right: calc(30px + var(--safe-area-inset-right));
-    bottom: calc(35px + var(--safe-area-inset-bottom));
+    /* top: auto; */
+    /* right: ; */
+    /* right: calc(30px + var(--safe-area-inset-right));
+    bottom: calc(35px + var(--safe-area-inset-bottom)); */
     width: 3em;
     height: 3em;
     cursor: pointer;
     border-radius: 20px;
     border: solid 2px;
     padding: 5px 10px;
-    z-index: 15;
+    margin-right: 15px;
+    /* z-index: 15; */
 }
 
 

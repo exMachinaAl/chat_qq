@@ -17,7 +17,8 @@
     <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
-    <div class="login-container" style="display: flex">
+    <!-- <div class="login-container" style="display: flex"> -->
+    <div class="login-container" style="display: none">
       <div class="login-wrapper-c">
         <h1 class="login-title">QQ chat</h1>
         <input class="login-input" id="userN" type="text" placeholder="email" />
@@ -46,7 +47,8 @@
       </div>
     </div>
 
-    <div class="dashboard-chat" style="display: none">
+    <!-- <div class="dashboard-chat" style="display: none"> -->
+    <div class="dashboard-chat" style="display: flex">
       <!-- Mobile Touch Overlay for Sidebar -->
       <input type="checkbox" id="sidebar-toggle" class="hidden-toggle" />
       <label for="sidebar-toggle" class="overlay"></label>
@@ -61,6 +63,9 @@
       </div>
 
       <!-- Chat List Section -->
+       <div class="wa-container-focus">
+
+       </div>
       <div class="chat-list">
         <div class="chat-list-header">
           <label for="sidebar-toggle" class="back-button">←</label>
@@ -84,7 +89,7 @@
         </div>
 
         <div class="conversations" id="friends-list">
-          <div class="button-add-friend" onclick="addFriend_popup()">+</div>
+          <!-- <div class="button-add-friend" onclick="addFriend_popup()">+</div> -->
           <!-- <a href="#" class="conversation active">
             <div class="conversation-avatar">A</div>
             <div class="conversation-info">
@@ -103,7 +108,7 @@
                 apakah kamu mau melihat film
               </div>
             </div>
-        </a> -->
+          </a> -->
 
           <!-- 
           <a href="#" class="conversation">
@@ -121,6 +126,9 @@
               <div class="conversation-preview">mama: jangan lupa makan!!</div>
             </div>
           </a> -->
+        </div>
+        <div class="button-add-container-foot">
+          <div class="button-add-friend" onclick="addFriend_popup()">+</div>
         </div>
       </div>
 
