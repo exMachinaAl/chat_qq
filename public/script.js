@@ -18,7 +18,7 @@ const socket = io("http://localhost:3000");
 //   await mainLogic();
 // }, false);
 
-let focusInMsgWa = "";
+let focusInMsgWa = "chats";
 
 window.onload = async () => {
   // localStorage.clear()
@@ -289,7 +289,8 @@ async function addFriend_add() {
 }
 
 function showDashboard(username) {
-  document.querySelector(".login-container").style.display = "none";
+  // document.querySelector(".login-container").style.display = "none";
+  document.querySelector(".container-center-form").style.display = "none";
   document.querySelector(".dev-mode-button-csv-class").style.display = "none";
   document.querySelector(".dashboard-chat").style.display = "flex";
 }
@@ -364,8 +365,8 @@ async function loadMessagesGroupWa(sender_id, groupId) {
     .then((data) => {
       const chatBox = document.getElementById("chatBox");
       chatBox.innerHTML = "";
-      
-      data.forEach( async (msg) => {
+
+      data.forEach(async (msg) => {
         const divMsg = document.createElement("div");
         divMsg.className = `message ${
           msg.QUID == sender_id ? "sent" : "received"
@@ -384,13 +385,11 @@ async function loadMessagesGroupWa(sender_id, groupId) {
             divName.className = `message-name-sender`;
             divName.textContent = data[0]?.username;
             divMsg.appendChild(divName);
-
-
           });
-          const divTime = document.createElement("div");
-          divTime.className = "message-timestamp";
-          divTime.textContent = msg.timestamp;
-          divMsg.appendChild(divTime);
+        const divTime = document.createElement("div");
+        divTime.className = "message-timestamp";
+        divTime.textContent = msg.timestamp;
+        divMsg.appendChild(divTime);
       });
     });
 }
@@ -441,19 +440,17 @@ socket.on("receiveMessage", async (data) => {
   chatBox.appendChild(divMsg);
 
   await fetch(`${hostApi}/api/friend/friendData?QUID_fr=${data.from}`, {
-          method: "GET",
-        })
-          .then((res) => res.json())
-          .then((datas) => {
-            // nameOfMGRP = data[0]?.username;
+    method: "GET",
+  })
+    .then((res) => res.json())
+    .then((datas) => {
+      // nameOfMGRP = data[0]?.username;
 
-            const divName = document.createElement("div");
-            divName.className = `message-name-sender`;
-            divName.textContent = datas[0]?.username;
-            divMsg.appendChild(divName);
-
-
-          });
+      const divName = document.createElement("div");
+      divName.className = `message-name-sender`;
+      divName.textContent = datas[0]?.username;
+      divMsg.appendChild(divName);
+    });
 
   // const divName = document.createElement("div");
   // divName.className = `message-name-sender`;
@@ -471,7 +468,7 @@ function submitForm() {
     user: document.getElementById("emailOrPhone").value,
     password: document.getElementById("password").value,
   };
-
+  
   fetch(`${hostApi}/api/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -481,31 +478,33 @@ function submitForm() {
     .then((response) => {
       alert(response.message);
       if (response?.status) {
-        document.querySelector(".middle-form").style.display = "none";
-        document.querySelector(".login-container").style.display = "block";
+        formContainer.style.transform = "translateX(0)";
+        document.getElementById("emailOrPhone").value = '';
+        document.getElementById("password").value = '';
       }
     })
     .catch((err) => {
       alert("Gagal koneksi ke server!");
+      document.getElementById("password").value = '';
       console.error(err);
     });
 }
 
-document.querySelectorAll("a[data-href]").forEach((link) => {
-  // hanya sebagai perpindahan tab reg to log dan sebaliknya
-  link.addEventListener("click", function (e) {
-    e.preventDefault();
-    // alert('hell nah,', e.currentTarget.getAttribute('data-href')) // wrong tipe of check debug
-    const directroute = e.currentTarget.getAttribute("data-href");
-    if (directroute === "/register") {
-      document.querySelector(".login-container").style.display = "none";
-      document.querySelector(".middle-form").style.display = "block";
-    } else if (directroute === "/login") {
-      document.querySelector(".middle-form").style.display = "none";
-      document.querySelector(".login-container").style.display = "flex";
-    }
-  });
-});
+// document.querySelectorAll("a[data-href]").forEach((link) => {
+//   // hanya sebagai perpindahan tab reg to log dan sebaliknya
+//   link.addEventListener("click", function (e) {
+//     e.preventDefault();
+//     // alert('hell nah,', e.currentTarget.getAttribute('data-href')) // wrong tipe of check debug
+//     const directroute = e.currentTarget.getAttribute("data-href");
+//     if (directroute === "/register") {
+//       document.querySelector(".login-container").style.display = "none";
+//       document.querySelector(".middle-form").style.display = "flex";
+//     } else if (directroute === "/login") {
+//       document.querySelector(".middle-form").style.display = "none";
+//       document.querySelector(".login-container").style.display = "flex";
+//     }
+//   });
+// });
 
 function isLoginUI() {
   const isLogin =
@@ -529,6 +528,7 @@ function newHost_DevMode() {
 function changeMenuWaMode(menu) {
   var elm = document.getElementById("waControlMenu");
   let isValid = true;
+  const isMobile = (window.innerWidth <= 576) ? true : false 
   const tabActF = document.querySelectorAll(".tab");
   tabActF.forEach((elm) => {
     elm.classList.remove("active");
@@ -536,16 +536,27 @@ function changeMenuWaMode(menu) {
 
   switch (menu) {
     case "chat": {
-      elm.style.transform = "translateX(0)";
       focusInMsgWa = "chats";
+      elm.style.transform = "translateX(0)";
       break;
     }
     case "group": {
-      elm.style.transform = "translateX(-280px)";
       focusInMsgWa = "groups";
+      if (isMobile) {
+        elm.style.transform = `translateX(-${85}vw)`;
+        return
+      }
+      
+      // elm.style.transform = "translateX(-280px)";
+      elm.style.transform = "translateX(-280px)";
       break;
     }
     case "server": {
+      if (isMobile) {
+        elm.style.transform = `translateX(-${2*window.innerWidth}px)`;
+        return
+      }
+      // elm.style.transform = "translateX(-560px)";
       elm.style.transform = "translateX(-560px)";
       break;
     }
@@ -559,3 +570,17 @@ function changeMenuWaMode(menu) {
     document.getElementById(`tab-${menu}-wa`).classList.add("active");
   }
 }
+
+const toRegister = document.getElementById("toRegister");
+const toLogin = document.getElementById("toLogin");
+const formContainer = document.getElementById("formContainer");
+
+toRegister.addEventListener("click", (e) => {
+  e.preventDefault();
+  formContainer.style.transform = "translateX(-300px)";
+});
+
+toLogin.addEventListener("click", (e) => {
+  e.preventDefault();
+  formContainer.style.transform = "translateX(0)";
+});

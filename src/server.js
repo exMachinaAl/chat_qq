@@ -18,8 +18,8 @@ const { json } = require("stream/consumers");
 
 const SECRET = process.env.JWT_SECRET;
 const DEFAULT_ROOM = "room"
-const HOST = "localhost";
-// const HOST = "0.0.0.0";
+// const HOST = "localhost";
+const HOST = "0.0.0.0";
 // const HOST = "192.168.119.218";
 // const HOST = "https://buck-well-kingfish.ngrok-free.app";
 const PORT = 3000;
