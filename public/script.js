@@ -1,7 +1,13 @@
-const hostApi = "http://localhost:3000";
-const socket = io("http://localhost:3000");
-// const hostApi = "http://192.168.119.218:3000";
-// const socket = io("http://192.168.119.218:3000");
+// const hostApi = "http://localhost:3000";
+// const socket = io("http://localhost:3000");
+// const hostApi = "http://192.168.35.218:3000";
+// const socket = io("http://192.168.35.218:3000");
+// const hostApi = "https://192.168.35.218:3000";
+// const socket = io("https://192.168.35.218:3000");
+// const hostApi = "https://192.168.193.80:3000";
+// const socket = io("https://192.168.193.80:3000");
+const hostApi = "https://192.168.191.80:3000"; // << tunnel yang bisa dan tlah diuji 1 orang
+const socket = io("https://192.168.191.80:3000"); // << tunnel yang bisa dan tlah diuji 1 orang
 // const hostApi = "https://buck-well-kingfish.ngrok-free.app";
 // const socket = io("https://buck-well-kingfish.ngrok-free.app");
 // const hostApi = "https://keno-impressed-several-pocket.trycloudflare.com";
@@ -50,7 +56,17 @@ window.onload = async () => {
 async function mainLogic() {
   await loadFriendsWa();
   await loadGroupWa();
+  eventReceivedMessages();
 }
+
+function eventReceivedMessages() {
+  fetch(
+    `${hostApi}/api/chat/chatstatus?eventTrigger=appOpen&received_id=${localStorage.getItem(
+      "QUID"
+    )}`
+  );
+}
+
 function loadGroupWa() {
   return new Promise((resolve, reject) => {
     fetch(
@@ -127,6 +143,7 @@ function loadFriendsWa() {
           divInfo.className = "conversation-info";
           divInfo.onclick = () => {
             startChat(friend.QUID_friend); // ganti dari friend.id
+            eventFocusChat(friend.QUID_friend);
             document.getElementById("sidebar-toggle").checked = false;
             // alert("membuka chat mode")
           };
@@ -144,6 +161,14 @@ function loadFriendsWa() {
         reject(e);
       });
   });
+}
+
+function eventFocusChat(sender_idAsFocused) {
+  fetch(
+    `${hostApi}/api/chat/chatstatus?eventTrigger=chatFocus&received_id=${localStorage.getItem(
+      "QUID"
+    )}&sender_id=${sender_idAsFocused}`
+  );
 }
 
 // function getNativeItem(key) {
@@ -288,7 +313,14 @@ async function addFriend_add() {
   location.reload();
 }
 
-function showDashboard(username) {
+function showVoiceChat() {
+  document.querySelector(".container-center-form").style.display = "none";
+  document.querySelector(".dev-mode-button-csv-class").style.display = "none";
+  document.querySelector(".dashboard-chat").style.display = "none";
+  document.getElementById("voiceChatD").style.display = "flex";
+}
+
+function showDashboard() {
   // document.querySelector(".login-container").style.display = "none";
   document.querySelector(".container-center-form").style.display = "none";
   document.querySelector(".dev-mode-button-csv-class").style.display = "none";
@@ -394,7 +426,7 @@ async function loadMessagesGroupWa(sender_id, groupId) {
     });
 }
 
-// Render chat ke tampilan
+// Render chat ke tampilan dan ambil data centang dari database
 function renderMessages(sender_id, receiver_id, messages) {
   const chatBox = document.getElementById("chatBox");
 
@@ -408,6 +440,28 @@ function renderMessages(sender_id, receiver_id, messages) {
     divMsg.textContent = msg.message;
     chatBox.appendChild(divMsg);
 
+    //add centang disini diatas e timestamp
+
+    if (msg.sender_id == sender_id) {
+      let status = 0;
+
+      if (msg.is_received) status = 1;
+      if (msg.is_received && msg.is_readed) status = 2;
+
+      const statusDiv = document.createElement("span");
+      statusDiv.className = "message-status-check";
+      if (status === 0) {
+        statusDiv.innerHTML = '<br><span style="color:#00ff55">&#10003;</span>';
+      } else if (status === 1) {
+        statusDiv.innerHTML =
+          '<br><span style="color:#00ff55">&#10003;&#10003;</span>';
+      } else if (status === 2) {
+        statusDiv.innerHTML =
+          '<br><span style="color:#00ff55">&#10003;&#10003;&#10003;</span>';
+      }
+      divMsg.appendChild(statusDiv);
+    }
+
     const divTime = document.createElement("div");
     divTime.className = "message-timestamp";
     divTime.textContent = msg.timestamp;
@@ -415,15 +469,36 @@ function renderMessages(sender_id, receiver_id, messages) {
   });
 }
 
-// Dapat pesan baru dari socket
+// Dapat pesan baru dari socket ini jg
 socket.on("new_message", (data) => {
   const chatBox = document.getElementById("chatBox");
   const divMsg = document.createElement("div");
+  const sender_id = localStorage.getItem("QUID");
   divMsg.className = `message ${
-    data?.sender_id == localStorage.getItem("QUID") ? "sent" : "received"
+    data?.sender_id == sender_id ? "sent" : "received"
   }`;
   divMsg.textContent = data?.message;
   chatBox.appendChild(divMsg);
+
+  if (data?.sender_id == sender_id) {
+    let status = 0;
+
+    // if (data?.is_received) status = 1;
+    // if (data?.is_received && data?.is_readed) status = 2;
+
+    const statusDiv = document.createElement("span");
+    statusDiv.className = "message-status-check";
+    if (status === 0) {
+      statusDiv.innerHTML = '<br><span style="color:#00ff55">&#10003;</span>';
+    } //else if (status === 1) {
+    //   statusDiv.innerHTML =
+    //     '<br><span style="color:#00ff55">&#10003;&#10003;</span>';
+    // } else if (status === 2) {
+    //   statusDiv.innerHTML =
+    //     '<br><span style="color:#00ff55">&#10003;&#10003;&#10003;</span>';
+    // }
+    divMsg.appendChild(statusDiv);
+  }
 
   const divTime = document.createElement("div");
   divTime.className = "message-timestamp";
@@ -468,7 +543,7 @@ function submitForm() {
     user: document.getElementById("emailOrPhone").value,
     password: document.getElementById("password").value,
   };
-  
+
   fetch(`${hostApi}/api/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -479,13 +554,13 @@ function submitForm() {
       alert(response.message);
       if (response?.status) {
         formContainer.style.transform = "translateX(0)";
-        document.getElementById("emailOrPhone").value = '';
-        document.getElementById("password").value = '';
+        document.getElementById("emailOrPhone").value = "";
+        document.getElementById("password").value = "";
       }
     })
     .catch((err) => {
       alert("Gagal koneksi ke server!");
-      document.getElementById("password").value = '';
+      document.getElementById("password").value = "";
       console.error(err);
     });
 }
@@ -528,7 +603,7 @@ function newHost_DevMode() {
 function changeMenuWaMode(menu) {
   var elm = document.getElementById("waControlMenu");
   let isValid = true;
-  const isMobile = (window.innerWidth <= 576) ? true : false 
+  const isMobile = window.innerWidth <= 576 ? true : false;
   const tabActF = document.querySelectorAll(".tab");
   tabActF.forEach((elm) => {
     elm.classList.remove("active");
@@ -544,17 +619,17 @@ function changeMenuWaMode(menu) {
       focusInMsgWa = "groups";
       if (isMobile) {
         elm.style.transform = `translateX(-${85}vw)`;
-        return
+        return;
       }
-      
+
       // elm.style.transform = "translateX(-280px)";
       elm.style.transform = "translateX(-280px)";
       break;
     }
     case "server": {
       if (isMobile) {
-        elm.style.transform = `translateX(-${2*window.innerWidth}px)`;
-        return
+        elm.style.transform = `translateX(-${2 * window.innerWidth}px)`;
+        return;
       }
       // elm.style.transform = "translateX(-560px)";
       elm.style.transform = "translateX(-560px)";
@@ -584,3 +659,177 @@ toLogin.addEventListener("click", (e) => {
   e.preventDefault();
   formContainer.style.transform = "translateX(0)";
 });
+
+async function joinVoiceChat(roomId) {
+  if (localStorage.getItem("isJoinedVC") == null) {
+    alert("anda akan masuk vc ini");
+    console.log("sy baru join voicech");
+    connectWRTC(roomId)
+    localStorage.setItem("isJoinedVC", "true");
+  }
+
+    socket.emit("voice_setParticipant", {
+      playerName: localStorage.getItem("username"),
+      playerId: localStorage.getItem("QUID"),
+      roomId,
+    });
+
+
+  showVoiceChat();
+}
+socket.on("userInRVC", (data) => {
+  const containerPLVC = document.getElementById("containerVCPlayerList");
+  containerPLVC.innerHTML = ""
+  Object.entries(data).forEach(([username, userData]) => {
+    const elvc = document.createElement("div");
+    elvc.id = `roomID-${userData.roomId}`;
+
+    const elvcid = document.createElement("div");
+    elvcid.textContent = `${getSmartCode(userData.playerName)}`;
+    elvc.appendChild(elvcid);
+
+    containerPLVC.appendChild(elvc);
+  });
+});
+
+
+
+
+
+
+
+
+// critical code
+let device;
+    // let roomId;
+    let stream;
+    let producerTransport, consumerTransport;
+    let producer;
+    let consumers = new Map();
+    let isMuted = false;
+
+    async function connectWRTC (roomId) {
+      // roomId = document.getElementById("roomInput").value;
+      if (!roomId) return alert("Enter room ID!");
+
+      await new Promise((resolve) => {
+        socket.emit("joinRoom", { roomId }, resolve);
+      });
+
+      device = new mediasoupClient.Device();
+      const rtpCapabilities = await new Promise((resolve) => {
+        socket.emit("getRtpCapabilities", null, resolve);
+      });
+      await device.load({ routerRtpCapabilities: rtpCapabilities });
+
+      await createProducer();
+      await createConsumer();
+
+      const otherProducers = await new Promise((resolve) => {
+        socket.emit("getProducers", null, resolve);
+      });
+
+      for (const producerId of otherProducers) {
+        await consume(producerId);
+      }
+
+      socket.emit("resume");
+
+      socket.on("new-producer", async ({ producerId }) => {
+        if (!consumers.has(producerId)) {
+          await consume(producerId);
+        }
+      });
+
+      document.getElementById("voice_ch_mute-unmute").disabled = false;
+      document.getElementById("voice_ch_exit").disabled = false;
+      // document.getElementById("joinBtn").disabled = true;
+    };
+
+    async function createProducer() {
+      const prodData = await new Promise((resolve) => {
+        socket.emit("createProducerTransport", null, resolve);
+      });
+
+      producerTransport = device.createSendTransport(prodData);
+
+      producerTransport.on("connect", ({ dtlsParameters }, callback) => {
+        socket.emit("connectProducerTransport", { dtlsParameters }, callback);
+      });
+
+      producerTransport.on("produce", ({ kind, rtpParameters }, callback) => {
+        socket.emit("produce", { kind, rtpParameters }, ({ id }) => {
+          callback({ id });
+        });
+      });
+
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const track = stream.getAudioTracks()[0];
+      producer = await producerTransport.produce({ track });
+    }
+
+    async function createConsumer() {
+      const consData = await new Promise((resolve) => {
+        socket.emit("createConsumerTransport", null, resolve);
+      });
+
+      consumerTransport = device.createRecvTransport(consData);
+
+      consumerTransport.on("connect", ({ dtlsParameters }, callback) => {
+        socket.emit("connectConsumerTransport", { dtlsParameters }, callback);
+      });
+    }
+
+    async function consume(producerId) {
+      const consumerInfo = await new Promise((resolve) => {
+        socket.emit("consume", {
+          producerId,
+          rtpCapabilities: device.rtpCapabilities,
+        }, resolve);
+      });
+
+      if (!consumerInfo?.id) return console.warn("Failed to consume");
+
+      const consumer = await consumerTransport.consume({
+        id: consumerInfo.id,
+        producerId: consumerInfo.producerId,
+        kind: consumerInfo.kind,
+        rtpParameters: consumerInfo.rtpParameters,
+      });
+
+      const audio = document.createElement("audio");
+      audio.srcObject = new MediaStream([consumer.track]);
+      audio.autoplay = true;
+      document.body.appendChild(audio);
+
+      consumers.set(producerId, { consumer, audio });
+    }
+
+    document.getElementById("voice_ch_mute-unmute").addEventListener("click", () => {
+      if (!producer) return;
+      isMuted = !isMuted;
+      producer.track.enabled = !isMuted;
+      document.getElementById("voice_ch_mute-unmute").innerText = isMuted ? "Unmute" : "Mute";
+    });
+
+    document.getElementById("voice_ch_exit").addEventListener("click", () => {
+      if (producer) producer.close();
+      if (producerTransport) producerTransport.close();
+      if (consumerTransport) consumerTransport.close();
+
+      for (const { consumer, audio } of consumers.values()) {
+        consumer.close();
+        audio.remove();
+      }
+
+      consumers.clear();
+      socket.emit("leaveRoom");
+      resetUI();
+    });
+
+    function resetUI() {
+      document.getElementById("voice_ch_mute-unmute").innerText = "Mute";
+      document.getElementById("voice_ch_mute-unmute").disabled = true;
+      document.getElementById("voice_ch_exit").disabled = true;
+      // document.getElementById("joinBtn").disabled = false;
+    }

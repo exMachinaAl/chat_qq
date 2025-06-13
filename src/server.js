@@ -1,14 +1,19 @@
 require("dotenv").config({
   path: require("path").resolve(__dirname, "../.env-qq-config"),
 });
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+
 const express = require("express");
 const app = express();
 const http = require("http");
+const https = require("https");
 const { Server } = require("socket.io");
 const session = require("express-session");
 const db = require("./utility/mysql");
 const path = require("path");
 const jwt = require("jsonwebtoken");
+const mediasoup = require('mediasoup')
+const fs = require('fs')
 
 const chatRoutes = require("./router/chat");
 const friendRoutes = require("./router/friends");
@@ -19,13 +24,29 @@ const { json } = require("stream/consumers");
 const SECRET = process.env.JWT_SECRET;
 const DEFAULT_ROOM = "room"
 // const HOST = "localhost";
-const HOST = "0.0.0.0";
-// const HOST = "192.168.119.218";
+// const HOST = "0.0.0.0";
+// const HOST = "192.168.193.80";
+const HOST = "192.168.191.80"; // << tunnel yang bisa dan tlah diuji 1 orang
+// const HOST = "192.168.35.218";
 // const HOST = "https://buck-well-kingfish.ngrok-free.app";
 const PORT = 3000;
+// const IPS = "192.168.35.218";
+// const IPS = "192.168.193.80";
+const IPS = "192.168.191.80"; // << tunnel yang bisa dan tlah diuji 1 orang
+// const URL_PRIVATE = "http://localhost:3000"
+// const URL_PRIVATE = "https://192.168.35.218:3000";
+// const URL_PRIVATE = "https://192.168.193.80:3000";
+const URL_PRIVATE = "https://192.168.191.80:3000"; // << tunnel yang bisa dan tlah diuji 1 orang
 
 //memulai untuk setel databse
-const server = http.createServer(app);
+// const server = http.createServer(app);
+const server = https.createServer(
+  {
+    key: fs.readFileSync("./certs/key.pem"),
+    cert: fs.readFileSync("./certs/cert.pem"),
+  },
+  app
+);
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -37,7 +58,27 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static("public"));
 
+const rooms = new Map();
+let worker;
+let router;
+
+(async () => {
+  worker = await mediasoup.createWorker();
+  router = await worker.createRouter({
+    mediaCodecs: [
+      {
+        kind: "audio",
+        mimeType: "audio/opus",
+        clockRate: 48000,
+        channels: 2,
+      },
+    ],
+  });
+})();
+
 const userSockets = {};
+let voiceSockets = {}
+
 io.on("connection", (socket) => {
   socket.on("register", (userId) => {
     userSockets[userId] = socket.id;
@@ -50,7 +91,7 @@ io.on("connection", (socket) => {
     // Simpan ke DB
     // db.query(sql, [sender_id, receiver_id, message], (err, result) => {
     //   if (err) return console.error(err);
-    fetch("http://localhost:3000/api/chat/send", {
+    fetch(`${URL_PRIVATE}/api/chat/send`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sender_id, receiver_id, message }),
@@ -83,7 +124,7 @@ io.on("connection", (socket) => {
   socket.on("loadGroupAuth", ({ quid }) => {
     // const members = groupMembers[group];
 
-    fetch(`http://localhost:3000/api/chat/getgroup?QUID_player=${quid}`, {
+    fetch(`${URL_PRIVATE}/api/chat/getgroup?QUID_player=${quid}`, {
       method: "GET",
     })
       .then((res) => res.json())
@@ -117,7 +158,7 @@ io.on("connection", (socket) => {
     const user = userSockets[quid];
     // console.log("try to use socket send message group")
 
-    fetch("http://localhost:3000/api/chat/sendgroup", {
+    fetch(`${URL_PRIVATE}/api/chat/sendgroup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ group_id: groupId, sender_id: quid, message }),
@@ -152,7 +193,236 @@ io.on("connection", (socket) => {
         break;
       }
     }
+
+    cleanUpSocket(socket);
   });
+
+
+  socket.on("voice_setParticipant", ({ playerName, playerId, roomId }) => {
+    if(!voiceSockets[roomId]){
+      voiceSockets[roomId] = {};
+    }
+    if(!voiceSockets[roomId][playerId]){
+      voiceSockets[roomId][playerId] = { socketId: socket.id, playerName, roomId};
+    }
+    
+    socket.join(roomId)
+    io.to(roomId).emit('userInRVC', voiceSockets[roomId])
+  })
+  socket.on("voice_getAllParticipant", ({ roomId }) => {
+    io.to(roomId).emit('userInRVC', voiceSockets[roomId])
+  })
+  socket.on('voice_removeParticipant', ({ roomId, playerId }) => {
+    delete voiceSockets[roomId][playerId]
+
+    io.to(roomId).emit("userInRVC", voiceSockets[roomId]);
+  })
+
+
+
+  //critical code
+  socket.on("joinRoom", ({ roomId }, callback) => {
+    if (!rooms.has(roomId)) {
+      rooms.set(roomId, {
+        producers: new Map(),
+        consumers: new Map(),
+        transports: new Map()
+      });
+    }
+
+    socket.join(roomId);
+    socket.data.roomId = roomId;
+
+    console.log(`Socket ${socket.id} joined room ${roomId}`);
+    callback({ joined: true });
+  });
+
+  socket.on("getRtpCapabilities", (data, callback) => {
+    callback(router.rtpCapabilities);
+  });
+
+  socket.on("createProducerTransport", async (_, callback) => {
+    const transport = await router.createWebRtcTransport({
+      listenIps: [{ ip: IPS, announcedIp: null }],
+      enableUdp: true,
+      enableTcp: true,
+      preferUdp: true,
+    });
+
+    const roomchk = getRoom(socket);
+    if (!roomchk) {
+      console.warn("Room tidak ditemukan untuk socket ini.");
+      return; // atau callback({ error: 'Room not found' });
+    }
+
+
+    getRoom(socket).transports.set(`${socket.id}_producer`, transport);
+    callback({
+      id: transport.id,
+      iceParameters: transport.iceParameters,
+      iceCandidates: transport.iceCandidates,
+      dtlsParameters: transport.dtlsParameters
+    });
+  });
+
+  socket.on("connectProducerTransport", async ({ dtlsParameters }, callback) => {
+    const roomchk = getRoom(socket);
+    if (!roomchk) {
+      console.warn("Room tidak ditemukan untuk socket ini.");
+      return; // atau callback({ error: 'Room not found' });
+    }
+    const transport = getRoom(socket).transports.get(`${socket.id}_producer`);
+    await transport.connect({ dtlsParameters });
+    callback();
+  });
+
+  socket.on("produce", async ({ kind, rtpParameters }, callback) => {
+    const roomchk = getRoom(socket);
+    if (!roomchk) {
+      console.warn("Room tidak ditemukan untuk socket ini.");
+      return; // atau callback({ error: 'Room not found' });
+    }
+    const transport = getRoom(socket).transports.get(`${socket.id}_producer`);
+    const producer = await transport.produce({ kind, rtpParameters });
+
+    getRoom(socket).producers.set(socket.id, producer);
+    socket.broadcast.emit("new-producer", { producerId: producer.id });
+    callback({ id: producer.id });
+  });
+
+  socket.on("createConsumerTransport", async (_, callback) => {
+    const roomchk = getRoom(socket);
+    if (!roomchk) {
+      console.warn("Room tidak ditemukan untuk socket ini.");
+      return; // atau callback({ error: 'Room not found' });
+    }
+    const transport = await router.createWebRtcTransport({
+      listenIps: [{ ip: IPS, announcedIp: null }],
+      enableUdp: true,
+      enableTcp: true,
+      preferUdp: true,
+    });
+
+    getRoom(socket).transports.set(`${socket.id}_consumer`, transport);
+    callback({
+      id: transport.id,
+      iceParameters: transport.iceParameters,
+      iceCandidates: transport.iceCandidates,
+      dtlsParameters: transport.dtlsParameters
+    });
+  });
+
+  socket.on("connectConsumerTransport", async ({ dtlsParameters }, callback) => {
+    const roomchk = getRoom(socket);
+    if (!roomchk) {
+      console.warn("Room tidak ditemukan untuk socket ini.");
+      return; // atau callback({ error: 'Room not found' });
+    }
+    const transport = getRoom(socket).transports.get(`${socket.id}_consumer`);
+    await transport.connect({ dtlsParameters });
+    callback();
+  });
+
+  socket.on("getProducers", (_, callback) => {
+    const roomchk = getRoom(socket);
+    if (!roomchk) {
+      console.warn("Room tidak ditemukan untuk socket ini.");
+      return; // atau callback({ error: 'Room not found' });
+    }
+    const allProducers = Array.from(getRoom(socket).producers.entries())
+      .filter(([id]) => id !== socket.id)
+      .map(([id, producer]) => producer.id);
+
+    callback(allProducers);
+  });
+
+  socket.on("consume", async ({ producerId, rtpCapabilities }, callback) => {
+    const roomchk = getRoom(socket);
+    if (!roomchk) {
+      console.warn("Room tidak ditemukan untuk socket ini.");
+      return; // atau callback({ error: 'Room not found' });
+    }
+    const producerEntry = Array.from(getRoom(socket).producers.values()).find(p => p.id === producerId);
+    const transport = getRoom(socket).transports.get(`${socket.id}_consumer`);
+
+    if (!router.canConsume({ producerId, rtpCapabilities })) {
+      return callback({ error: "Cannot consume" });
+    }
+
+    const consumer = await transport.consume({
+      producerId,
+      rtpCapabilities,
+      paused: false
+    });
+
+    getRoom(socket).consumers.set(`${socket.id}_${producerId}`, consumer);
+
+    callback({
+      id: consumer.id,
+      producerId,
+      kind: consumer.kind,
+      rtpParameters: consumer.rtpParameters
+    });
+  });
+
+  socket.on("resume", async (_, callback) => {
+    const roomchk = getRoom(socket);
+    if (!roomchk) {
+      console.warn("Room tidak ditemukan untuk socket ini.");
+      return; // atau callback({ error: 'Room not found' });
+    }
+    const room = getRoom(socket);
+    for (const [key, consumer] of room.consumers.entries()) {
+      if (key.startsWith(socket.id)) {
+        await consumer.resume();
+      }
+    }
+    if (callback) callback();
+  });
+
+  socket.on("leaveRoom", () => {
+    cleanUpSocket(socket);
+    socket.leave(socket.data.roomId);
+    socket.data.roomId = null;
+  });
+
+  // socket.on("disconnect", () => {
+  //   cleanUpSocket(socket);
+  //   console.log("Disconnected:", socket.id);
+  // });
+
+  function getRoom(socket) {
+    const roomId = socket.data.roomId;
+    return rooms.get(roomId);
+  }
+
+  function cleanUpSocket(socket) {
+    const room = getRoom(socket);
+    if (!room) return;
+
+    room.producers.delete(socket.id);
+    for (const key of room.consumers.keys()) {
+      if (key.startsWith(socket.id)) room.consumers.delete(key);
+    }
+
+    for (const key of room.transports.keys()) {
+      if (key.startsWith(socket.id)) {
+        room.transports.get(key).close();
+        room.transports.delete(key);
+      }
+    }
+
+    // Jika room kosong, hapus
+    if (
+      room.producers.size === 0 &&
+      room.consumers.size === 0 &&
+      room.transports.size === 0
+    ) {
+      rooms.delete(socket.data.roomId);
+    }
+  }
+
+
 });
 
 // chat logic

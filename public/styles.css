@@ -566,7 +566,7 @@ body {
     height: 100%;
     width: 85vw;
     /* z-index: 5; */
-    overflow: auto;
+    overflow: hidden;
   }
 
   .menu-wa-mode {
@@ -836,6 +836,7 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 999;
+  /* background: #00ff55 */
 }
 
 .popup-dev-mode {
@@ -929,4 +930,74 @@ body {
 .form a {
   color: #3670bd;
   text-decoration: none;
+}
+
+.something {
+  display: flex;
+  flex-direction: column;
+  width: 85vw;
+  height: 95vh;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background-color: #3670bd;
+  color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  /* cursor: pointer; */
+}
+
+.container-vc-something {
+  display: flex;
+  /* flex-direction: row; */
+  flex-wrap: wrap;  
+  /* row-gap: 0px; */
+  /* column-gap: 1px; */
+  height: 80vh;
+  /* border: #333333 1px solid; */
+}
+.container-vc-something div {
+  display: flex;
+  flex-direction: column;
+  height: 25vh;
+  min-height: 2em;
+  max-height: 10em;
+  width: 25vw;
+  min-width: 2em ;
+  max-width: 10em ;
+  margin-left: 20px;
+  /* margin-right: 20px; */
+  justify-content: center;
+  align-items: center;
+  border: none;
+  background-color: #3f3454;
+  border-radius: 20px;
+}
+.container-vc-something div div {
+  display: flex; 
+  height: 60px;
+  width: 60px;
+  border-radius: 100px;
+  background-color: #9d9d9d;
+}
+
+.control-something {
+  display: flex;
+  top: 0;
+  height: 10vh;
+  min-height: 30px;
+  max-height: 40x;
+  width: 80vw;
+  max-width: 25em ;
+  justify-content: center;
+  /* align-items: center; */
+  background: #393f4f;
+  border: none ;
+  border-radius: 20px;
+}
+.control-something div {
+  width: 65px;
+  margin: 0 10px 0 10px;
+  background-color: gray;
+  border-radius: 20px;
 }

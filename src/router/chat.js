@@ -67,9 +67,7 @@ WHERE qm.QUID = ?;
   `;
 
   try {
-    const [results] = await db.query(sql, [
-      QUID_player
-    ]);
+    const [results] = await db.query(sql, [QUID_player]);
     res.json(results);
     // console.log(results[0]);
     // results.forEach(el => {
@@ -88,9 +86,7 @@ ORDER BY timestamp ASC;
   `;
 
   try {
-    const [results] = await db.query(sql, [
-      group_xid
-    ]);
+    const [results] = await db.query(sql, [group_xid]);
     res.json(results);
     // console.log(results);
   } catch (err) {
@@ -106,5 +102,34 @@ ORDER BY timestamp ASC;
 //       });
 //     });
 //   }
+
+router.get("/chatstatus", async (req, res) => {
+  const { eventTrigger, received_id } = req.query;
+
+  let sql = "UPDATE messages SET";
+
+  if (eventTrigger === "appOpen") {
+    sql += " is_received = ? where receiver_id = ?";
+    try {
+      const [results] = await db.query(sql, [1, received_id]);
+      return res.json(results);
+      // console.log(results);
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+  
+  if (eventTrigger === "chatFocus") {
+    const { sender_id } = req.query;
+    sql += " is_readed = ? where receiver_id = ? and sender_id = ?";
+    try {
+      const [results] = await db.query(sql, [1, received_id, sender_id]);
+      return res.json(results);
+      // console.log(results);
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+});
 
 module.exports = router;

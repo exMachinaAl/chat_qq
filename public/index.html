@@ -19,6 +19,7 @@
     <!-- <script src="/socket.io/socket.io.js"></script> -->
   </head>
   <body>
+    <!-- <div class="container-center-form" style="display: none;"> -->
     <div class="container-center-form">
       <div class="container-logres-form">
         <div class="form-container" id="formContainer">
@@ -49,6 +50,23 @@
       >
         dm
       </button>
+    </div>
+
+    <div class="container-center-form" id="voiceChatD" style="display: none;">
+    <!-- <div class="container-center-form"> -->
+      <div class="something">
+        <div class="container-vc-something" id="containerVCPlayerList">
+          <div>
+            <div>AK</div>
+          </div>
+        </div>
+        <div class="control-something">
+          <div id="voice_ch_back" onclick="showDashboard()"></div>
+          <div id="voice_ch_mute-unmute">Mute</div>
+          <div id="titik3"></div>
+          <div id="voice_ch_exit" onclick="localStorage.removeItem('isJoinedVC'); alert('anda akan keluar vc ini'); socket.emit('voice_removeParticipant', ({ roomId: 'abc', playerId: localStorage.getItem('QUID')})); showDashboard();">Leave!</div>
+        </div>
+      </div>
     </div>
 
     <!-- <div class="login-container" style="display: flex"> -->
@@ -93,9 +111,9 @@
 
       <!-- Sidebar for server/channel navigation -->
       <div class="sidebar">
-        <div class="sidebar-icon">G</div>
-        <div class="sidebar-icon">W</div>
-        <div class="sidebar-icon">C</div>
+        <div class="sidebar-icon">WwW</div>
+        <div class="sidebar-icon">SCH</div>
+        <div class="sidebar-icon" onclick="joinVoiceChat('abc')">R18</div>
         <div class="sidebar-icon add">+</div>
         <button onclick="logout()">logout</button>
       </div>
@@ -284,6 +302,7 @@
           "none";
       }
     </script>
+    <script src="/libs/mediasoup-client.bundle.js"></script>
     <script src="/script.js"></script>
     <!-- <script src="/public/script.js"></script> -->
   </body>
