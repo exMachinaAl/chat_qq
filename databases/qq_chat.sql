@@ -11,7 +11,7 @@
  Target Server Version : 100432 (10.4.32-MariaDB)
  File Encoding         : 65001
 
- Date: 31/05/2025 09:43:14
+ Date: 14/06/2025 01:09:02
 */
 
 SET NAMES utf8mb4;
@@ -147,61 +147,71 @@ CREATE TABLE `messages`  (
   `sender_id` bigint(20) NULL DEFAULT NULL,
   `receiver_id` bigint(20) NULL DEFAULT NULL,
   `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `is_received` tinyint(1) NULL DEFAULT NULL,
+  `is_readed` tinyint(1) NULL DEFAULT NULL,
   `timestamp` datetime NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `sender_id`(`sender_id`) USING BTREE,
   INDEX `receiver_id`(`receiver_id`) USING BTREE,
   CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `qq_member` (`QUID`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`receiver_id`) REFERENCES `qq_member` (`QUID`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 46 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 54 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of messages
 -- ----------------------------
-INSERT INTO `messages` VALUES (1, 1, 2, 'hello nano', '2025-04-21 00:54:56');
-INSERT INTO `messages` VALUES (2, 2, 1, 'oh hey maki', '2025-04-21 00:56:00');
-INSERT INTO `messages` VALUES (3, 1, 3, 'te qos vei ra van de', '2025-04-21 00:56:43');
-INSERT INTO `messages` VALUES (4, 1, 2, 'mmq', '2025-04-21 23:00:58');
-INSERT INTO `messages` VALUES (5, 1, 2, 'qqt', '2025-04-21 23:04:39');
-INSERT INTO `messages` VALUES (6, 1, 2, 'hello', '2025-04-21 23:07:56');
-INSERT INTO `messages` VALUES (7, 1, 3, 'halo hime', '2025-04-21 23:09:04');
-INSERT INTO `messages` VALUES (8, 1, 2, 'vein', '2025-04-21 23:09:42');
-INSERT INTO `messages` VALUES (9, 1, 3, 'loe', '2025-04-21 23:10:02');
-INSERT INTO `messages` VALUES (10, 1, 2, 'eeee', '2025-04-21 23:10:07');
-INSERT INTO `messages` VALUES (11, 1, 2, 'mau kok gak kenek', '2025-04-21 23:10:16');
-INSERT INTO `messages` VALUES (12, 2, 1, 'yo gak ero lah', '2025-04-21 23:10:43');
-INSERT INTO `messages` VALUES (13, 1, 2, 'jadi gimana', '2025-04-21 23:19:10');
-INSERT INTO `messages` VALUES (14, 2, 1, 'bejirrr', '2025-04-21 23:22:57');
-INSERT INTO `messages` VALUES (15, 2, 1, 'gwacor king', '2025-04-21 23:23:07');
-INSERT INTO `messages` VALUES (16, 1, 2, 'anjay', '2025-04-21 23:23:13');
-INSERT INTO `messages` VALUES (17, 1, 2, 'work njir lah', '2025-04-21 23:23:28');
-INSERT INTO `messages` VALUES (18, 2, 1, 'udah sangat amat bagus untuk progres minggu pertama', '2025-04-21 23:23:36');
-INSERT INTO `messages` VALUES (19, 1, 2, 'wqwq', '2025-04-21 23:23:47');
-INSERT INTO `messages` VALUES (20, 2, 1, 'gokil parah', '2025-04-21 23:24:18');
-INSERT INTO `messages` VALUES (21, 2, 1, 'id password e iki karo ketik en engko tak kirim e nak grub', '2025-04-21 23:24:39');
-INSERT INTO `messages` VALUES (22, 2, 1, 'bjir amanda', '2025-04-21 23:27:50');
-INSERT INTO `messages` VALUES (23, 1, 3, 'lets play tomorow', '2025-04-22 21:37:11');
-INSERT INTO `messages` VALUES (24, 2, 1, 'Anjing', '2025-04-23 13:27:18');
-INSERT INTO `messages` VALUES (25, 2, 1, 'Hendra peod', '2025-04-23 13:27:25');
-INSERT INTO `messages` VALUES (26, 1, 2, 'rill', '2025-04-23 13:27:39');
-INSERT INTO `messages` VALUES (27, 2, 1, 'Kuda', '2025-04-23 13:27:43');
-INSERT INTO `messages` VALUES (28, 2, 3, 'Hime', '2025-04-23 13:31:02');
-INSERT INTO `messages` VALUES (29, 3, 2, 'hell', '2025-04-24 01:25:02');
-INSERT INTO `messages` VALUES (30, 3, 2, 'hell nah', '2025-04-24 11:27:16');
-INSERT INTO `messages` VALUES (32, 14, 15, 'halo', '2025-04-26 14:36:11');
-INSERT INTO `messages` VALUES (33, 15, 14, 'halo juga hend', '2025-04-26 14:36:18');
-INSERT INTO `messages` VALUES (34, 15, 14, 'qq', '2025-04-26 14:36:40');
-INSERT INTO `messages` VALUES (35, 1, 3, 'jrlek e', '2025-05-10 13:58:55');
-INSERT INTO `messages` VALUES (36, 1, 3, 'halo hend', '2025-05-10 16:35:13');
-INSERT INTO `messages` VALUES (37, 1, NULL, 'halo', '2025-05-16 20:17:34');
-INSERT INTO `messages` VALUES (38, 1, 2, 'hell nah', '2025-05-17 09:35:28');
-INSERT INTO `messages` VALUES (39, 1, 5, 'panteq', '2025-05-17 20:47:54');
-INSERT INTO `messages` VALUES (40, 1, 2, 'ergrsg', '2025-05-17 23:16:56');
-INSERT INTO `messages` VALUES (41, 1, 2, 'wqdwead', '2025-05-17 23:17:00');
-INSERT INTO `messages` VALUES (42, 1, 3, 'qwdwd', '2025-05-17 23:17:05');
-INSERT INTO `messages` VALUES (43, 1, 2, 'fgtcbhtd', '2025-05-17 23:19:00');
-INSERT INTO `messages` VALUES (44, 1, 2, 'halo nano iam in chats', '2025-05-17 23:20:15');
-INSERT INTO `messages` VALUES (45, 1, 3, 'adfasdfa', '2025-05-17 23:24:59');
+INSERT INTO `messages` VALUES (1, 1, 2, 'hello nano', 1, 1, '2025-04-21 00:54:56');
+INSERT INTO `messages` VALUES (2, 2, 1, 'oh hey maki', 1, 1, '2025-04-21 00:56:00');
+INSERT INTO `messages` VALUES (3, 1, 3, 'te qos vei ra van de', 1, 0, '2025-04-21 00:56:43');
+INSERT INTO `messages` VALUES (4, 1, 2, 'hello to <name>', 1, 1, '2025-04-21 23:00:58');
+INSERT INTO `messages` VALUES (5, 1, 2, 'qqt', 1, 1, '2025-04-21 23:04:39');
+INSERT INTO `messages` VALUES (6, 1, 2, 'hello', 1, 1, '2025-04-21 23:07:56');
+INSERT INTO `messages` VALUES (7, 1, 3, 'halo hime', 1, NULL, '2025-04-21 23:09:04');
+INSERT INTO `messages` VALUES (8, 1, 2, 'vein', 1, 1, '2025-04-21 23:09:42');
+INSERT INTO `messages` VALUES (9, 1, 3, 'loe', 1, NULL, '2025-04-21 23:10:02');
+INSERT INTO `messages` VALUES (10, 1, 2, 'eeee', 1, 1, '2025-04-21 23:10:07');
+INSERT INTO `messages` VALUES (11, 1, 2, 'mau kok gak kenek', 1, 1, '2025-04-21 23:10:16');
+INSERT INTO `messages` VALUES (12, 2, 1, 'yo gak ero lah', 1, 1, '2025-04-21 23:10:43');
+INSERT INTO `messages` VALUES (13, 1, 2, 'jadi gimana', 1, 1, '2025-04-21 23:19:10');
+INSERT INTO `messages` VALUES (14, 2, 1, 'bejirrr', 1, 1, '2025-04-21 23:22:57');
+INSERT INTO `messages` VALUES (15, 2, 1, 'gwacor king', 1, 1, '2025-04-21 23:23:07');
+INSERT INTO `messages` VALUES (16, 1, 2, 'anjay', 1, 1, '2025-04-21 23:23:13');
+INSERT INTO `messages` VALUES (17, 1, 2, 'work njir lah', 1, 1, '2025-04-21 23:23:28');
+INSERT INTO `messages` VALUES (18, 2, 1, 'udah sangat amat bagus untuk progres minggu pertama', 1, 1, '2025-04-21 23:23:36');
+INSERT INTO `messages` VALUES (19, 1, 2, 'wqwq', 1, 1, '2025-04-21 23:23:47');
+INSERT INTO `messages` VALUES (20, 2, 1, 'gokil parah', 1, 1, '2025-04-21 23:24:18');
+INSERT INTO `messages` VALUES (21, 2, 1, 'id password e iki karo ketik en engko tak kirim e nak grub', 1, 1, '2025-04-21 23:24:39');
+INSERT INTO `messages` VALUES (22, 2, 1, 'bjir amanda', 1, 1, '2025-04-21 23:27:50');
+INSERT INTO `messages` VALUES (23, 1, 3, 'lets play tomorow', 1, NULL, '2025-04-22 21:37:11');
+INSERT INTO `messages` VALUES (24, 2, 1, 'Anjing', 1, 1, '2025-04-23 13:27:18');
+INSERT INTO `messages` VALUES (25, 2, 1, 'Hendra peod', 1, 1, '2025-04-23 13:27:25');
+INSERT INTO `messages` VALUES (26, 1, 2, 'rill', 1, 1, '2025-04-23 13:27:39');
+INSERT INTO `messages` VALUES (27, 2, 1, 'Kuda', 1, 1, '2025-04-23 13:27:43');
+INSERT INTO `messages` VALUES (28, 2, 3, 'Hime', 1, 1, '2025-04-23 13:31:02');
+INSERT INTO `messages` VALUES (29, 3, 2, 'hell', 1, NULL, '2025-04-24 01:25:02');
+INSERT INTO `messages` VALUES (30, 3, 2, 'hell nah', 1, NULL, '2025-04-24 11:27:16');
+INSERT INTO `messages` VALUES (32, 14, 15, 'halo', NULL, NULL, '2025-04-26 14:36:11');
+INSERT INTO `messages` VALUES (33, 15, 14, 'halo juga hend', NULL, NULL, '2025-04-26 14:36:18');
+INSERT INTO `messages` VALUES (34, 15, 14, 'qq', NULL, NULL, '2025-04-26 14:36:40');
+INSERT INTO `messages` VALUES (35, 1, 3, 'jrlek e', 1, NULL, '2025-05-10 13:58:55');
+INSERT INTO `messages` VALUES (36, 1, 3, 'halo hend', 1, NULL, '2025-05-10 16:35:13');
+INSERT INTO `messages` VALUES (37, 1, NULL, 'halo', NULL, NULL, '2025-05-16 20:17:34');
+INSERT INTO `messages` VALUES (38, 1, 2, 'hell nah', 1, 1, '2025-05-17 09:35:28');
+INSERT INTO `messages` VALUES (39, 1, 5, 'panteq', NULL, NULL, '2025-05-17 20:47:54');
+INSERT INTO `messages` VALUES (40, 1, 2, 'ergrsg', 1, 1, '2025-05-17 23:16:56');
+INSERT INTO `messages` VALUES (41, 1, 2, 'wqdwead', 1, 1, '2025-05-17 23:17:00');
+INSERT INTO `messages` VALUES (42, 1, 3, 'qwdwd', 1, NULL, '2025-05-17 23:17:05');
+INSERT INTO `messages` VALUES (43, 1, 2, 'fgtcbhtd', 1, 1, '2025-05-17 23:19:00');
+INSERT INTO `messages` VALUES (44, 1, 2, 'halo nano iam in chats', 1, 1, '2025-05-17 23:20:15');
+INSERT INTO `messages` VALUES (45, 1, 3, 'adfasdfa', 1, NULL, '2025-05-17 23:24:59');
+INSERT INTO `messages` VALUES (46, 2, 1, 'oi', 1, 1, '2025-06-09 20:26:58');
+INSERT INTO `messages` VALUES (47, 1, 2, 'oi juga', 1, 1, '2025-06-09 20:27:30');
+INSERT INTO `messages` VALUES (48, 1, 2, 'owalah nano', 1, 1, '2025-06-09 20:41:26');
+INSERT INTO `messages` VALUES (49, 1, 2, 'hei', 1, 1, '2025-06-10 20:45:48');
+INSERT INTO `messages` VALUES (50, 1, 2, 'hei hei', 1, 1, '2025-06-10 20:46:04');
+INSERT INTO `messages` VALUES (51, 1, 2, 'hola', 1, 1, '2025-06-10 20:48:39');
+INSERT INTO `messages` VALUES (52, 3, 2, 'nah bro', 1, NULL, '2025-06-13 21:43:23');
+INSERT INTO `messages` VALUES (53, 2, 1, 'nah bro', 1, 1, '2025-06-13 21:44:43');
 
 -- ----------------------------
 -- Table structure for qq_member
